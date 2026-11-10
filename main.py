@@ -29,9 +29,8 @@ class EmotionMusicPlayer(ctk.CTk):
         # Create GUI elements
         self.create_gui()
         
-        # Start camera thread
-        self.camera_thread = threading.Thread(target=self.update_camera, daemon=True)
-        self.camera_thread.start()
+        # Schedule safe UI thread camera updates
+        self.after(50, self.update_camera)
     
     def create_gui(self):
         """Create the GUI elements"""
@@ -72,44 +71,51 @@ class EmotionMusicPlayer(ctk.CTk):
         self.quit_btn.pack(side="right", padx=10)
     
     def update_camera(self):
-        """Update camera feed and detect emotions"""
-        while self.running:
-            ret, frame = self.camera.read()
-            if ret:
-                # Detect emotion
-                try:
-                    result = DeepFace.analyze(
-                        frame,
-                        actions=['emotion'],
-                        enforce_detection=False
-                    )
-                    emotion = result[0]['dominant_emotion']
-                    
-                    # Update emotion if changed and cooldown passed
-                    current_time = time.time()
-                    if (emotion != self.current_emotion and 
-                        current_time - self.last_emotion_change > self.emotion_cooldown):
-                        self.current_emotion = emotion
-                        self.last_emotion_change = current_time
-                        # Update emotion label
-                        self.emotion_label.configure(text=f"Detected Emotion: {emotion}")
-                        # Play matching music
-                        threading.Thread(
-                            target=self.spotify.play_tracks_by_mood,
-                            args=(emotion,),
-                            daemon=True
-                        ).start()
+        """Update camera feed and detect emotions safely via Tkinter loop"""
+        if not self.running:
+            return
+
+        ret, frame = self.camera.read()
+        if ret:
+            # Detect emotion
+            try:
+                result = DeepFace.analyze(
+                    frame,
+                    actions=['emotion'],
+                    enforce_detection=False,
+                    silent=True
+                )
+                emotion = result[0]['dominant_emotion']
                 
-                except Exception as e:
-                    print(f"Error detecting emotion: {str(e)}")
-                
-                # Convert frame for display
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame = cv2.resize(frame, (640, 480))
-                img = Image.fromarray(frame)
-                img_tk = ImageTk.PhotoImage(image=img)
-                self.camera_label.configure(image=img_tk)
-                self.camera_label.image = img_tk
+                # Update emotion if changed and cooldown passed
+                current_time = time.time()
+                if (emotion != self.current_emotion and 
+                    current_time - self.last_emotion_change > self.emotion_cooldown):
+                    self.current_emotion = emotion
+                    self.last_emotion_change = current_time
+                    # Update emotion label
+                    self.emotion_label.configure(text=f"Detected Emotion: {emotion} (DeepFace)")
+                    print(f"Detected Emotion: {emotion}. Triggering Spotify playback...")
+                    # Play matching music
+                    threading.Thread(
+                        target=self.spotify.play_tracks_by_mood,
+                        args=(emotion,),
+                        daemon=True
+                    ).start()
+            
+            except Exception as e:
+                print(f"Error detecting emotion: {str(e)}")
+            
+            # Convert frame for display
+            disp_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            disp_frame = cv2.resize(disp_frame, (640, 480))
+            img = Image.fromarray(disp_frame)
+            img_tk = ImageTk.PhotoImage(image=img)
+            self.camera_label.configure(image=img_tk)
+            self.camera_label.image = img_tk
+        
+        if self.running:
+            self.after(30, self.update_camera)
     
     def toggle_camera(self):
         """Toggle camera on/off"""
@@ -119,8 +125,7 @@ class EmotionMusicPlayer(ctk.CTk):
         else:
             self.toggle_btn.configure(text="Stop")
             self.running = True
-            self.camera_thread = threading.Thread(target=self.update_camera, daemon=True)
-            self.camera_thread.start()
+            self.after(30, self.update_camera)
     
     def quit_app(self):
         """Clean up and quit application"""

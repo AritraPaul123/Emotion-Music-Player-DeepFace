@@ -1,0 +1,98 @@
+{
+  "model": "DeepFace Pre-trained Emotion Model",
+  "samples": 500,
+  "accuracy": 0.47,
+  "precision": 0.7344580124344746,
+  "recall": 0.47,
+  "f1_score": 0.5550481323262385,
+  "avg_latency_ms": 17.762384843999826,
+  "confusion_matrix": [
+    [
+      85,
+      15,
+      3,
+      105,
+      38
+    ],
+    [
+      33,
+      134,
+      1,
+      37,
+      5
+    ],
+    [
+      5,
+      1,
+      5,
+      12,
+      2
+    ],
+    [
+      2,
+      1,
+      0,
+      8,
+      0
+    ],
+    [
+      1,
+      0,
+      0,
+      4,
+      3
+    ]
+  ],
+  "classes": [
+    "neutral",
+    "happy",
+    "surprise",
+    "sad",
+    "angry"
+  ],
+  "classification_report": {
+    "neutral": {
+      "precision": 0.6746031746031746,
+      "recall": 0.34552845528455284,
+      "f1-score": 0.45698924731182794,
+      "support": 246.0
+    },
+    "happy": {
+      "precision": 0.8874172185430463,
+      "recall": 0.638095238095238,
+      "f1-score": 0.7423822714681441,
+      "support": 210.0
+    },
+    "surprise": {
+      "precision": 0.5555555555555556,
+      "recall": 0.2,
+      "f1-score": 0.29411764705882354,
+      "support": 25.0
+    },
+    "sad": {
+      "precision": 0.04819277108433735,
+      "recall": 0.7272727272727273,
+      "f1-score": 0.0903954802259887,
+      "support": 11.0
+    },
+    "angry": {
+      "precision": 0.0625,
+      "recall": 0.375,
+      "f1-score": 0.10714285714285714,
+      "support": 8.0
+    },
+    "accuracy": 0.47,
+    "macro avg": {
+      "precision": 0.44565374395722274,
+      "recall": 0.4571792841305037,
+      "f1-score": 0.3382055006415283,
+      "support": 500.0
+    },
+    "weighted avg": {
+      "precision": 0.7344580124344746,
+      "recall": 0.47,
+      "f1-score": 0.5550481323262385,
+      "support": 500.0
+    }
+  }
+}
