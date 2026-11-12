@@ -1,5 +1,9 @@
 opencv-python>=4.8.0
-deepface>=0.0.79
+# Keep the DeepFace compatibility backend aligned with TensorFlow.
+deepface[tensorflow]==0.0.101
+tensorflow==2.16.2
+tf-keras==2.16.0
+
 customtkinter>=5.2.0
 spotipy>=2.23.0
 pillow>=10.0.0
